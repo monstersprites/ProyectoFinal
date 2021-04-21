@@ -1,0 +1,77 @@
+﻿@page "/agregar_cliente"
+
+<a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
+
+<br />
+<br />
+<br />
+
+<h3>Agregar cliente</h3>
+
+<hr />
+
+<form>
+
+    <div class="mb-3">
+        <label for="txtcedula" class="form-label">Cédula</label>
+        <input type="text" class="form-control" id="txtcedula" @bind-value="cedula">
+    </div>
+
+    <button>Verificar</button>
+
+    <div class="mb-3">
+        <label for="txtnombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="txtnombre" @bind-value="nombre" disabled>
+    </div>
+
+    <div class="mb-3">
+        <label for="txtapellido" class="form-label">Apellido</label>
+        <input type="text" class="form-control" id="txtapellido" @bind-value="apellido">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtnacionalidad" class="form-label">Nacionalidad</label>
+        <input type="text" class="form-control" id="txtnacionalidad" @bind-value="nacionalidad">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtsangre" class="form-label">Tipo de sangre:</label>
+        <select id="txtsangre" @bind="tsangre">
+            <option value="null" selected>Seleccione el tipo de sangre</option>
+            <option value="O negativo">O negativo</option>
+            <option value="O positivo">O positivo</option>
+            <option value="A negativo">A negativo</option>
+            <option value="A positivo">A positivo</option>
+            <option value="B negativo">B negativo</option>
+            <option value="B positivo">B positivo</option>
+            <option value="AB negativo">AB negativo</option>
+            <option value="AB positivo">AB positivo</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="txtfotopersona" class="form-label">Foto de usted </label>
+        <input type="file" class="form-control" id="txtfotopersona" @bind-value="fotopersona">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtfotolicencia" class="form-label">Foto de su licencia de conducir </label>
+        <input type="file" class="form-control" id="txtfotolicencia" @bind-value="fotolicencia">
+    </div>
+
+    <button class="btn btn-primary">Agregar</button>
+
+</form>
+
+    @code {
+
+        string cedula;
+        string nombre;
+        string apellido;
+        string correo;
+        string nacionalidad;
+        string tsangre;
+        string fotopersona;
+        string fotolicencia;
+
+    }

@@ -56,3 +56,11 @@ C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\ProyectoFinal.dll
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\ProyectoFinal.pdb
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\ProyectoFinal.genruntimeconfig.cache
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\AgregarCliente.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\EditarCliente.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\EliminarCliente.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\GestionClientes.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\Razor\Pages\AgregarCliente.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\Razor\Pages\EditarCliente.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\Razor\Pages\EliminarCliente.razor.g.cs
+C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\Razor\Pages\GestionClientes.razor.g.cs
