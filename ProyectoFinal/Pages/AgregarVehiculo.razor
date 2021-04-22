@@ -1,76 +1,85 @@
 ﻿@page "/agregar_vehiculo"
-
-<a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
-
-<br />
-<br />
-<br />
+@using System.Net.Http;
+@using System.Net.Http.Headers;
+@using System.Threading.Tasks;
 
 
-<h2>Agregar vehiculo</h2>
+    <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
-<hr />
-
-<form>
-    <div class="mb-3">
-        <label for="txtmarca" class="form-label">Marca</label>
-        <input type="text" class="form-control" id="txtmarca" @bind-value="marca">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtmodelo" class="form-label">Modelo</label>
-        <input type="text" class="form-control" id="txtmodelo" @bind-value="modelo">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtaño" class="form-label">Año</label>
-        <input type="number" class="form-control" id="txtaño" @bind-value="año">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtprecio" class="form-label">Precio por día(RD$)</label>
-        <input type="number" class="form-control" id="txtprecio" @bind-value="precio">
-    </div>
-
-    <div class="custom-select">
-        <label>Tipo:</label>
-        <select @bind="tipo">
-            <option value="Carro">Carro</option>
-            <option value="Camioneta">Camioneta</option>
-            <option value="Camión">Camión</option>
-            <option value="Motocicleta">Motocicleta</option>
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label for="txtcapacidad" class="form-label">Capacidad de carga(Kg)</label>
-        <input type="number" class="form-control" id="txtcapacidad" @bind-value="capacidad">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtpasajeros" class="form-label">Pasajeros</label>
-        @pasajeros
-        <input type="range" class="form-control" id="txtpasajeros" @bind-value="pasajeros">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtmatricula" class="form-label">Matricula</label>
-        <input type="text" class="form-control" id="txtmatricula" @bind-value="matricula">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtseguro" class="form-label">Número de seguro</label>
-        <input type="number" class="form-control" id="txtseguro" @bind-value="seguro">
-    </div>
-
-    <div class="mb-3">
-        <label for="txtfoto" class="form-label">Foto</label>
-        <input type="file" class="form-control" id="txtfoto" @bind-value="foto">
-    </div>
+    <br />
+    <br />
+    <br />
 
 
-    <button class="btn btn-primary">Agregar</button>
-</form>
+    <h2>Agregar vehiculo</h2>
+
+    <hr />
+
+    <form>
+        <div class="mb-3">
+            <label for="txtmarca" class="form-label">Marca</label>
+            <input type="text" class="form-control" id="txtmarca" @bind-value="marca">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtmodelo" class="form-label">Modelo</label>
+            <input type="text" class="form-control" id="txtmodelo" @bind-value="modelo">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtaño" class="form-label">Año</label>
+            <input type="number" class="form-control" id="txtaño" @bind-value="año">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtcolor" class="form-label">Color</label>
+            <input type="text" class="form-control" id="txtcolor" @bind-value="color">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtprecio" class="form-label">Precio por día(RD$)</label>
+            <input type="number" class="form-control" id="txtprecio" @bind-value="precio">
+        </div>
+
+        <div class="custom-select">
+            <label>Tipo:</label>
+            <select @bind="tipo">
+                <option value="Carro">Carro</option>
+                <option value="Camioneta">Camioneta</option>
+                <option value="Camión">Camión</option>
+                <option value="Motocicleta">Motocicleta</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="txtcapacidad" class="form-label">Capacidad de carga(Kg)</label>
+            <input type="number" class="form-control" id="txtcapacidad" @bind-value="capacidad">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtpasajeros" class="form-label">Pasajeros</label>
+            @pasajeros
+            <input type="range" class="form-control" id="txtpasajeros" @bind-value="pasajeros">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtmatricula" class="form-label">Matricula</label>
+            <input type="text" class="form-control" id="txtmatricula" @bind-value="matricula">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtseguro" class="form-label">Número de seguro</label>
+            <input type="number" class="form-control" id="txtseguro" @bind-value="seguro">
+        </div>
+
+        <div class="mb-3">
+            <label for="txtfoto" class="form-label">Foto</label>
+            <input type="file" class="form-control" id="txtfoto" @bind-value="foto">
+        </div>
+
+
+        <button class="btn btn-primary" @onclick="addVehicle">Agregar</button>
+    </form>
 
 
     @code {
@@ -78,6 +87,7 @@
         string marca;
         string modelo;
         int año;
+        string color;
         int precio;
         string tipo;
         int capacidad;
@@ -85,5 +95,89 @@
         string matricula;
         long seguro;
         string foto;
+
+
+
+        public void addVehicle()
+        {
+
+            Vehicle nuevo_vehiculo = new Vehicle();
+
+            nuevo_vehiculo.BRAND = marca;
+            nuevo_vehiculo.MODEL = modelo;
+            nuevo_vehiculo.YEAR = año;
+            nuevo_vehiculo.COLOUR = color;
+            nuevo_vehiculo.PRICEPERDAY = precio;
+            nuevo_vehiculo.TYPE = tipo;
+            nuevo_vehiculo.LOADCAPACITY = capacidad.ToString();
+            nuevo_vehiculo.PASSAGERS = pasajeros;
+            nuevo_vehiculo.ENROLLMENT = matricula;
+            nuevo_vehiculo.INSURANCE_NO = seguro.ToString();
+            nuevo_vehiculo.PHOTO = foto;
+
+
+            Lanzar(nuevo_vehiculo);
+        }
+
+
+        public async Task<string> Lanzar(Vehicle v)
+        {
+
+            try
+            {
+
+                HttpClient client = new HttpClient()
+                {
+                    BaseAddress = new Uri("https://pruebasv4.herokuapp.com/"),
+                };
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpResponseMessage respuesta = client.PostAsJsonAsync("/registervehicle/", v).Result;
+                if (respuesta.StatusCode == HttpStatusCode.OK)
+                {
+                    // La respuesta es correcta y por ejemplo la retorno como string
+                    return await respuesta.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception e)
+            {
+
+            }
+
+            return "OK";
+
+        }
+
+        public class Vehicle
+        {
+
+            public string BRAND { get; set; }
+
+            public string MODEL { get; set; }
+
+            public int YEAR { get; set; }
+
+            public string COLOUR { get; set; }
+
+            public int PRICEPERDAY { get; set; }
+
+            public string TYPE { get; set; }
+
+            public string LOADCAPACITY { get; set; }
+
+            public int PASSAGERS { get; set; }
+
+            public string ENROLLMENT { get; set; }
+
+            public string INSURANCE_NO { get; set; }
+
+            public string PHOTO { get; set; }
+
+            public string LATITUDE { get; set; }
+
+            public string LONGITUDE { get; set; }
+
+        }
 
     }
