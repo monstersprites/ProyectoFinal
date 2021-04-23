@@ -61,7 +61,7 @@
     <div class="mb-3">
         <label for="txtpasajeros" class="form-label">Pasajeros</label>
         @pasajeros
-        <input type="range" class="form-control" id="txtpasajeros" @bind-value="pasajeros">
+        <input type="number" class="form-control" id="txtpasajeros" @bind-value="pasajeros">
     </div>
 
     <div class="mb-3">
@@ -79,6 +79,14 @@
         <input type="file" class="form-control" id="txtfoto" @bind-value="foto">
     </div>
 
+    <div class="mb-3">
+        <label for="map" class="form-label">Seleccione una ubicacion en el mapa</label>
+        <RadzenGoogleMap id="map" style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 18.98367097987177, Lng = -70.45763034294242 }) MapClick=@OnMapClick>
+            <Markers>
+                <RadzenGoogleMapMarker Position=@(new GoogleMapPosition() { Lat = latitud, Lng=longitud }) />
+            </Markers>
+        </RadzenGoogleMap>
+    </div>
 
     <button class="btn btn-primary" @onclick="ApiRest">Agregar</button>
 </form>
@@ -86,140 +94,35 @@
 
 @code {
 
+    [Inject]
+    public IJSRuntime JS { get; set; }
+
+    int zoom = 7;
     string marca;
     string modelo;
     int año;
     string color;
     int precio;
-    string tipo;
+    string tipo = "Carro";
     int capacidad;
     int pasajeros;
     string matricula;
     long seguro;
     string foto;
-
-
-
-    public void addVehicle()
+    double latitud;
+    double longitud;
+    
+    void OnMapClick(GoogleMapClickEventArgs args)
     {
-        string API = "https://pruebasv4.herokuapp.com/registervehicle";
-
-        Vehicle nuevo_vehiculo = new Vehicle();
-
-        nuevo_vehiculo.BRAND = marca;
-        nuevo_vehiculo.MODEL = modelo;
-        nuevo_vehiculo.YEAR = año;
-        nuevo_vehiculo.COLOUR = color;
-        nuevo_vehiculo.PRICEPERDAY = precio;
-        nuevo_vehiculo.TYPE = tipo;
-        nuevo_vehiculo.LOADCAPACITY = capacidad.ToString();
-        nuevo_vehiculo.PASSAGERS = pasajeros;
-        nuevo_vehiculo.ENROLLMENT = matricula;
-        nuevo_vehiculo.INSURANCE_NO = seguro.ToString();
-        nuevo_vehiculo.PHOTO = foto;
-
-
-        //GetPost2(API, nuevo_vehiculo);
+        latitud = args.Position.Lat;
+        longitud = args.Position.Lng;
     }
-
-    //public async Task<string> Lanzar(Vehicle v)
-    //{
-
-    //    try
-    //    {
-
-    //        HttpClient client = new HttpClient()
-    //        {
-    //            BaseAddress = new Uri("https://pruebasv4.herokuapp.com/registervehicle"),
-    //        };
-    //        client.DefaultRequestHeaders.Accept.Clear();
-    //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-    //        HttpResponseMessage respuesta = client.PostAsJsonAsync("/registervehicle/", v).Result;
-    //        if (respuesta.StatusCode == HttpStatusCode.OK)
-    //        {
-    //            // La respuesta es correcta y por ejemplo la retorno como string
-    //            return await respuesta.Content.ReadAsStringAsync();
-    //        }
-
-    //    }
-    //    catch (Exception e)
-    //    {
-
-    //    }
-
-    //    return "OK";
-
-    //}
-
-    //public static string GetPost1(string url, Vehicle vehiculo)
-    //{
-
-    //    string result = "";
-
-
-    //    WebRequest oRequest = WebRequest.Create(url);
-    //    oRequest.Method = "post";
-    //    oRequest.ContentType = "application/json; charset-UTF-8";
-
-    //    using (var oSW = new StreamWriter(oRequest.GetRequestStream()))
-    //    {
-
-    //        string json = JsonConvert.SerializeObject(vehiculo, Formatting.Indented);
-
-    //        oSW.Write(json);
-
-    //        oSW.Flush();
-    //        oSW.Close();
-
-    //    }
-
-    //    WebResponse oResponse = oRequest.GetResponse();
-    //    using (var oSR = new StreamReader(oResponse.GetResponseStream()))
-    //    {
-    //        result = oSR.ReadToEnd().Trim();
-    //    }
-
-
-    //    return result;
-    //}
-
-    //public static string GetPost2(string url, Vehicle vehiculo)
-    //{
-
-    //    string result = "";
-
-
-    //    WebRequest oRequest = WebRequest.Create(url);
-    //    oRequest.Method = "post";
-    //    oRequest.ContentType = "application/json; charset-UTF-8";
-
-    //    using (var oSW = new StreamWriter(oRequest.GetRequestStream()))
-    //    {
-
-    //        string json = "{ \"BRAND\":\"Audi\", \"MODEL\":\"R8\", \"YEAR\":\"2015\", \"COLOUR\":\"Azul\", \"PRICEPERDAY\":\"5000\"}";
-
-    //        oSW.Write(json);
-
-    //        oSW.Flush();
-    //        oSW.Close();
-
-    //    }
-
-    //    WebResponse oResponse = oRequest.GetResponse();
-    //    using (var oSR = new StreamReader(oResponse.GetResponseStream()))
-    //    {
-    //        result = oSR.ReadToEnd().Trim();
-    //    }
-
-
-    //    return result;
-    //}
 
     public async Task ApiRest()
     {
         var http = new HttpClient();
 
-        var body = new
+        var vehicle = new Vehicle
         {
             BRAND = marca,
             MODEL = modelo,
@@ -227,25 +130,28 @@
             COLOUR = color,
             PRICEPERDAY = precio,
             TYPE = tipo,
-            LOADCAPACITY = capacidad,
-            PASSAGERS = pasajeros,
-            ENROLLMENT = matricula,
-            INSURANCE_NO = seguro,
-            PHOTO = foto,
-
+            LOADCAPACITY = $"{capacidad}",
+            PASSENGERS = pasajeros,
+            Enrollment = matricula,
+            INSURANCE_NO = $"{seguro}",
+            LATITUDE = $"{latitud}",
+            LONGITUDE = $"{longitud}"
         };
 
-        var jsonBody = JsonConvert.SerializeObject(body);
+        vehicle.PHOTO = await JS.InvokeAsync<string>("toBase64", "txtfoto");
+
+        var jsonBody = JsonConvert.SerializeObject(vehicle);
         var buffer = Encoding.UTF8.GetBytes(jsonBody);
         var byteContent = new ByteArrayContent(buffer);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registervehicle", byteContent);
-        // var response = await http.GetAsync("https://pruebasv4.herokuapp.com");
 
         var content = await response.Content.ReadAsStringAsync();
 
-        Console.WriteLine(content);
+        var json = JsonConvert.DeserializeObject(content);
+
+        await JS.InvokeVoidAsync("alert", json);
     }
 
     public class Vehicle
@@ -265,9 +171,9 @@
 
         public string LOADCAPACITY { get; set; }
 
-        public int PASSAGERS { get; set; }
+        public int PASSENGERS { get; set; }
 
-        public string ENROLLMENT { get; set; }
+        public string Enrollment { get; set; }
 
         public string INSURANCE_NO { get; set; }
 
