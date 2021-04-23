@@ -48,8 +48,6 @@ C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\EliminarCliente.razor.g.cs
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\GestionClientes.razor.g.cs
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\Login.razor.g.cs
-C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\bin\Debug\netcoreapp3.1\System.Net.Http.Formatting.dll
-C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\bin\Debug\netcoreapp3.1\Newtonsoft.Json.Bson.dll
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\ProyectoFinal.csproj.CoreCompileInputs.cache
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\ProyectoFinal.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Daniel Lora\Desktop\Blazor's Apps\ProyectoFinal\obj\Debug\netcoreapp3.1\RazorDeclaration\ProyectoFinal.dll
