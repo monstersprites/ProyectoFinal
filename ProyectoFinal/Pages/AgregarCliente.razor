@@ -26,7 +26,7 @@
 
     <div class="mb-3">
         <label for="txtapellido" class="form-label">Apellido</label>
-        <input type="text" class="form-control" id="txtapellido" @bind-value="apellido">
+        <input type="text" class="form-control" id="txtapellido" @bind-value="apellido" disabled>
     </div>
 
     <div class="mb-3">
@@ -59,11 +59,14 @@
         <input type="file" class="form-control" id="txtfotolicencia" @bind-value="fotolicencia">
     </div>
 
-    <button class="btn btn-primary">Agregar</button>
+    <button class="btn btn-primary" @onclick="ApiRest">Agregar</button>
 
 </form>
 
     @code {
+
+        [Inject]
+        public IJSRuntime JS { get; set; }
 
         string cedula;
         string nombre;
@@ -73,5 +76,66 @@
         string tsangre;
         string fotopersona;
         string fotolicencia;
+
+
+        public async Task ApiRest()
+        {
+            var http = new HttpClient();
+
+            var cliente = new Cliente
+            {
+                IDENTIFICATION = cedula,
+                FIRSTNAME = nombre,
+                LASTNAME = apellido,
+                EMAIL = correo,
+                NATIONALITY = nacionalidad,
+                BLOODTYPE = tsangre,
+                PHOTOPERSON = fotopersona,
+                PHOTOLICENSE = fotolicencia,
+                LICENSE = ""
+
+            };
+
+            cliente.PHOTOPERSON = await JS.InvokeAsync<string>("toBase64", "txtfotopersona");
+            cliente.PHOTOPERSON = await JS.InvokeAsync<string>("toBase64", "txtfotolicencia");
+
+
+            var jsonBody = JsonConvert.SerializeObject(cliente);
+            var buffer = Encoding.UTF8.GetBytes(jsonBody);
+            var byteContent = new ByteArrayContent(buffer);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registerCustomer", byteContent);
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var json = JsonConvert.DeserializeObject(content);
+
+            await JS.InvokeVoidAsync("alert", json);
+        }
+
+
+        public class Cliente
+        {
+
+            public string IDENTIFICATION { get; set; }
+
+            public string FIRSTNAME { get; set; }
+
+            public string LASTNAME { get; set; }
+
+            public string EMAIL { get; set; }
+
+            public string LICENSE { get; set; }
+
+            public string NATIONALITY { get; set; }
+
+            public string BLOODTYPE{ get; set; }
+
+            public string PHOTOPERSON { get; set; }
+
+            public string PHOTOLICENSE { get; set; }
+
+        }
 
     }

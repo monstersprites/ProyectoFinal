@@ -1,21 +1,21 @@
 ﻿@page "/editar_vehiculo"
 
-    <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
+<a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
-    <br />
-    <br />
-    <br />
-    <h2>Editar Vehiculo</h2>
+<br />
+<br />
+<br />
+<h2>Editar Vehiculo</h2>
 
 <hr />
 
 <div class="m-3">
     <label for="txtmatricula">Matricula del vehiculo</label>
-    <input type="text" style="width:200px" class="form-control" placeholder="Matricula del vehiculo" id="txtmatricula" @bind-value="matricula"/>
+    <input type="text" style="width:200px" class="form-control" placeholder="Matricula del vehiculo" id="txtmatricula" @bind-value="matricula" />
     <br />
     <button class="btn btn-primary" @onclick="searchVehicle">Buscar</button>
 </div>
-    
+
 <hr />
 
 <div class="container">
@@ -90,97 +90,132 @@
         </RadzenGoogleMap>
     </div>
 
-    <button class="btn btn-info" >Editar</button>
+    <button class="btn btn-info">Editar</button>
 
 </div>
 
-    @code {
+@code {
 
-        string matricula;
+    [Inject]
+    public IJSRuntime JS { get; set; }
 
-        int zoom = 7;
-        string marca;
-        string modelo;
-        int año;
-        string color;
-        int precio;
-        string tipo;
-        int capacidad;
-        int pasajeros;
-        long seguro;
-        string foto;
-        double latitud;
-        double longitud;
+    string matricula;
 
-
-        void OnMapClick(GoogleMapClickEventArgs args)
-        {
-            latitud = args.Position.Lat;
-            longitud = args.Position.Lng;
-        }
+    int zoom = 7;
+    string marca;
+    string modelo;
+    int año;
+    string color;
+    int precio;
+    string tipo;
+    int capacidad;
+    int pasajeros;
+    long seguro;
+    string foto;
+    double latitud;
+    double longitud;
 
 
-        public void searchVehicle()
-        {
+    void OnMapClick(GoogleMapClickEventArgs args)
+    {
+        latitud = args.Position.Lat;
+        longitud = args.Position.Lng;
+    }
 
-            String API = $"https://pruebasv4.herokuapp.com/SearchEnrollment/{matricula}";
+    public void searchVehicle()
+    {
 
-            WebClient cliente = new WebClient();
+        String API = $"https://pruebasv4.herokuapp.com/SearchEnrollment/{matricula}";
 
-            var datos = cliente.DownloadString(API);
+        WebClient cliente = new WebClient();
 
-            var resultados = JsonConvert.DeserializeObject<Vehicle>(datos);
+        var datos = cliente.DownloadString(API);
 
-            marca = resultados.BRAND;
-            modelo = resultados.MODEL;
-            año = resultados.YEAR;
-            color = resultados.COLOUR;
-            precio = resultados.PRICEPERDAY;
-            tipo = resultados.TYPE;
-            capacidad = int.Parse(resultados.LOADCAPACITY);
-            pasajeros = resultados.PASSENGERS;
-            seguro = long.Parse(resultados.INSURANCE_NO);
-            foto = resultados.PHOTO;
-            latitud = double.Parse(resultados.LATITUDE);
-            longitud = double.Parse(resultados.LONGITUDE);
+        var resultados = JsonConvert.DeserializeObject<Vehicle>(datos);
 
-        }
-
-        public void editVehicle()
-        {
-
-        }
-
-        public class Vehicle
-        {
-
-            public string BRAND { get; set; }
-
-            public string MODEL { get; set; }
-
-            public int YEAR { get; set; }
-
-            public string COLOUR { get; set; }
-
-            public int PRICEPERDAY { get; set; }
-
-            public string TYPE { get; set; }
-
-            public string LOADCAPACITY { get; set; }
-
-            public int PASSENGERS { get; set; }
-
-            public string Enrollment { get; set; }
-
-            public string INSURANCE_NO { get; set; }
-
-            public string PHOTO { get; set; }
-
-            public string LATITUDE { get; set; }
-
-            public string LONGITUDE { get; set; }
-
-        }
-
+        marca = resultados.BRAND;
+        modelo = resultados.MODEL;
+        año = resultados.YEAR;
+        color = resultados.COLOUR;
+        precio = resultados.PRICEPERDAY;
+        tipo = resultados.TYPE;
+        capacidad = int.Parse(resultados.LOADCAPACITY);
+        pasajeros = resultados.PASSENGERS;
+        seguro = long.Parse(resultados.INSURANCE_NO);
+        foto = resultados.PHOTO;
+        latitud = double.Parse(resultados.LATITUDE);
+        longitud = double.Parse(resultados.LONGITUDE);
 
     }
+
+    public async Task editVehicle()
+    {
+
+        var http = new HttpClient();
+
+        var vehicle = new Vehicle
+        {
+            BRAND = marca,
+            MODEL = modelo,
+            YEAR = año,
+            COLOUR = color,
+            PRICEPERDAY = precio,
+            TYPE = tipo,
+            LOADCAPACITY = $"{capacidad}",
+            PASSENGERS = pasajeros,
+            INSURANCE_NO = $"{seguro}",
+            LATITUDE = $"{latitud}",
+            LONGITUDE = $"{longitud}"
+        };
+
+
+        vehicle.PHOTO = await JS.InvokeAsync<string>("toBase64", "txtfoto");
+
+        var jsonBody = JsonConvert.SerializeObject(vehicle);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/updatevehicle/"+matricula, byteContent);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var json = JsonConvert.DeserializeObject(content);
+
+        await JS.InvokeVoidAsync("alert", json);
+
+    }
+
+    public class Vehicle
+    {
+
+        public string BRAND { get; set; }
+
+        public string MODEL { get; set; }
+
+        public int YEAR { get; set; }
+
+        public string COLOUR { get; set; }
+
+        public int PRICEPERDAY { get; set; }
+
+        public string TYPE { get; set; }
+
+        public string LOADCAPACITY { get; set; }
+
+        public int PASSENGERS { get; set; }
+
+        public string Enrollment { get; set; }
+
+        public string INSURANCE_NO { get; set; }
+
+        public string PHOTO { get; set; }
+
+        public string LATITUDE { get; set; }
+
+        public string LONGITUDE { get; set; }
+
+    }
+
+
+}
