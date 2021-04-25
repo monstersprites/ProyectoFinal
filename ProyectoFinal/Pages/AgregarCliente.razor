@@ -1,5 +1,7 @@
 ﻿@page "/agregar_cliente"
 
+@using System.IO
+
 <a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
 
 <br />
@@ -51,12 +53,12 @@
 
     <div class="mb-3">
         <label for="txtfotopersona" class="form-label">Foto de usted </label>
-        <input type="file" class="form-control" id="txtfotopersona" @bind-value="fotopersona">
+        <InputFile OnChange="@LoadFilePersona" class="form-control" />
     </div>
 
     <div class="mb-3">
         <label for="txtfotolicencia" class="form-label">Foto de su licencia de conducir </label>
-        <input type="file" class="form-control" id="txtfotolicencia" @bind-value="fotolicencia">
+        <InputFile OnChange="@LoadFileLicencia" class="form-control" />
     </div>
 
     <button class="btn btn-primary" @onclick="ApiRest">Agregar</button>
@@ -93,12 +95,7 @@
                 PHOTOPERSON = fotopersona,
                 PHOTOLICENSE = fotolicencia,
                 LICENSE = ""
-
             };
-
-            cliente.PHOTOPERSON = await JS.InvokeAsync<string>("toBase64", "txtfotopersona");
-            cliente.PHOTOPERSON = await JS.InvokeAsync<string>("toBase64", "txtfotolicencia");
-
 
             var jsonBody = JsonConvert.SerializeObject(cliente);
             var buffer = Encoding.UTF8.GetBytes(jsonBody);
@@ -114,6 +111,37 @@
             await JS.InvokeVoidAsync("alert", json);
         }
 
+        public async Task LoadFilePersona(InputFileChangeEventArgs e)
+        {
+            try
+            {
+                using var reader = new StreamReader(e.File.OpenReadStream());
+
+                string file = await reader.ReadToEndAsync();
+                
+                fotopersona = Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public async Task LoadFileLicencia(InputFileChangeEventArgs e)
+        {
+            try
+            {
+                using var reader = new StreamReader(e.File.OpenReadStream());
+
+                string file = await reader.ReadToEndAsync();
+                
+                fotolicencia = Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
         public class Cliente
         {

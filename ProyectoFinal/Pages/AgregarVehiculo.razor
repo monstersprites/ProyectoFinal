@@ -72,7 +72,6 @@
     <div class="mb-3">
         <label for="txtfoto" class="form-label">Foto</label>
         <InputFile OnChange="@LoadFile" />
-        <img src="@foto" alt="photo" width="50px" id="photo">
     </div>
 
     <div class="mb-3">
@@ -84,7 +83,7 @@
         </RadzenGoogleMap>
     </div>
 
-    <button class="btn btn-primary" @onclick="ApiRest" type="button">Agregar</button>
+    <button class="btn btn-primary" @onclick="ApiRest" type="submit">Agregar</button>
 </form>
 
 
@@ -142,11 +141,11 @@
 
         var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registervehicle", byteContent);
 
-        @* var content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync();
 
         var json = JsonConvert.DeserializeObject(content);
 
-        await JS.InvokeVoidAsync("alert", json); *@
+        await JS.InvokeVoidAsync("alert", json);
     }
 
     public async Task LoadFile(InputFileChangeEventArgs e)
