@@ -1,12 +1,98 @@
 ﻿@page "/MapaVehiculos"
 
-    <a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
+<a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
 
 
-    <h3>Mapeado de vehiculos</h3>
+<h3>Mapeado de vehiculos</h3>
+
+<hr />
+
+<button class="btn btn-primary" @onclick="buscarVehiculos">Listar</button>
 
 
+<RadzenGoogleMap id="map" style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 18.98367097987177, Lng = -70.45763034294242 }) MarkerClick=@OnMarkerClick>
+    <Markers>
+        @foreach (var u in ubicaciones)
+        {
+            <RadzenGoogleMapMarker Position=@(new GoogleMapPosition() { Lat = u.Latitud, Lng= u.Longitud }) />
+        }
+    </Markers>
+</RadzenGoogleMap>
 
-    @code {
+@code {
+
+    int zoom = 7;
+
+    //double latitud;
+    //double longitud;
+
+    List<Vehicle> vehiculos = new List<Vehicle>();
+
+    List<Ubicaciones> ubicaciones = new List<Ubicaciones>();
+
+    public void buscarVehiculos()
+    {
+
+        String API = $"https://pruebasv4.herokuapp.com/AllVehicle";
+
+        WebClient cliente = new WebClient();
+
+        var datos = cliente.DownloadString(API);
+
+        vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos);
+
+        foreach (var v in vehiculos)
+        {
+            ubicaciones.Add(new Ubicaciones { Latitud = double.Parse(v.LATITUDE), Longitud = double.Parse(v.LONGITUDE) });
+        }
 
     }
+
+    void OnMarkerClick(RadzenGoogleMapMarker marker)
+    {
+
+
+
+    }
+
+    public class Vehicle
+    {
+
+        public string BRAND { get; set; }
+
+        public string MODEL { get; set; }
+
+        public int YEAR { get; set; }
+
+        public string COLOUR { get; set; }
+
+        public double PRICEPERDAY { get; set; }
+
+        public string TYPE { get; set; }
+
+        public string LOADCAPACITY { get; set; }
+
+        public int PASSENGERS { get; set; }
+
+        public string Enrollment { get; set; }
+
+        public string INSURANCE_NO { get; set; }
+
+        public string PHOTO { get; set; }
+
+        public string LATITUDE { get; set; }
+
+        public string LONGITUDE { get; set; }
+
+    }
+
+    public class Ubicaciones
+    {
+
+        public double Latitud { get; set; }
+
+        public double Longitud { get; set; }
+
+    }
+
+}

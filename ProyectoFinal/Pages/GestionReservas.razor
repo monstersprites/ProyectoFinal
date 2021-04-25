@@ -2,7 +2,46 @@
 
 <h3>Gestión de reservas</h3>
 
+<select @bind="vehiculo">
+    <option></option>
+</select>
+
+<br />
+<br />
+
+<label for="txtcedula">Cédula:</label>
+<input type="text" placeholder="Cédula del cliente" id="txtcedula" @bind-value="cedula_cliente" />
+
+<br />
+<br />
+
+<label for="txtfechainicio">Fecha inicio:</label>
+<input type="date" id="txtfechainicio" />
+
+<br />
+<br />
+
+<label for="txtfechafin">Fecha final:</label>
+<input type="date" id="txtfechafin" />
+
+<br />
+<br />
+
+<button class="btn btn-info">Reservar</button>
 
 @code {
+
+    string vehiculo;
+
+    string cedula_cliente;
+
+    string fecha_inicio;
+
+    string fecha_final;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
 
 }
