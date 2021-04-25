@@ -2,27 +2,33 @@
 
 <h3>Gestión de reservas</h3>
 
-<select @bind="vehiculo">
-    <option></option>
+<label for="txtvehiculo"></label>
+<select id="txtvehiculo" @bind="vehiculo">
+    <option selected>Seleccione un vehiculo</option>
 </select>
 
 <br />
 <br />
 
-<label for="txtcedula">Cédula:</label>
-<input type="text" placeholder="Cédula del cliente" id="txtcedula" @bind-value="cedula_cliente" />
+<label for="txtcedula"></label>
+<select id="txtcedula" @bind="cedula_cliente">
+    <option selected>Seleccione un cliente</option>
+    @foreach (var c in clientes) { 
+        <option value="@c.IDENTIFICATION">@c.IDENTIFICATION</option>
+    }
+</select>
 
 <br />
 <br />
 
 <label for="txtfechainicio">Fecha inicio:</label>
-<input type="date" id="txtfechainicio" />
+<input type="date" id="txtfechainicio" @bind-value="fecha_inicio" />
 
 <br />
 <br />
 
 <label for="txtfechafin">Fecha final:</label>
-<input type="date" id="txtfechafin" />
+<input type="date" id="txtfechafin" @bind-value="fecha_final" />
 
 <br />
 <br />
@@ -35,12 +41,61 @@
 
     string cedula_cliente;
 
-    string fecha_inicio;
+    DateTime fecha_inicio;
 
-    string fecha_final;
+    DateTime fecha_final;
+
+    List<Cliente> clientes = new List<Cliente>();
 
     protected override async Task OnInitializedAsync()
     {
+
+        String API = $"https://pruebasv4.herokuapp.com/AllClient";
+
+        WebClient cliente = new WebClient();
+
+        var datos = cliente.DownloadString(API);
+
+        clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos);
+
+    }
+
+    public void reservarVehiculo()
+    {
+
+        //String API = $"https://pruebasv4.herokuapp.com/getByID/{cedula_cliente}";
+
+        //WebClient cliente = new WebClient();
+
+        //var datos = cliente.DownloadString(API);
+
+        //var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
+
+        //cliente = resultados;
+
+
+    }
+
+    public class Cliente
+    {
+
+        public string IDENTIFICATION { get; set; }
+
+        public string FIRSTNAME { get; set; }
+
+        public string LASTNAME { get; set; }
+
+        public string EMAIL { get; set; }
+
+        public string LICENSE { get; set; }
+
+        public string NATIONALITY { get; set; }
+
+        public string BLOODTYPE { get; set; }
+
+        public string PHOTOPERSON { get; set; }
+
+        public string PHOTOLICENSE { get; set; }
 
     }
 
