@@ -19,16 +19,43 @@
     </Markers>
 </RadzenGoogleMap>
 
+
+@if (MostrarVehiculo == true)
+{
+
+    foreach (var f in filtro)
+    {
+
+        <div class="card" style="width: 18rem;">
+            <img src="" class="card-img-top">
+            <div class="card-body">
+                <h5 class="card-title">@f.BRAND  @f.MODEL</h5>
+                <p class="card-text">Matricula: @f.Enrollment</p>
+                <p class="card-text">Color: @f.COLOUR</p>
+                <p class="card-text">Cantidad de pasajeros: @f.PASSENGERS</p>
+                <p class="card-text">Capacidad de carga: @f.LOADCAPACITY Kgs</p>
+                <p class="card-text">Precio por día: @f.PRICEPERDAY</p>
+                <p class="card-text">Número de seguro: @f.INSURANCE_NO</p>
+            </div>
+        </div>
+
+    }
+
+}
+
+
+
 @code {
 
     int zoom = 7;
 
-    //double latitud;
-    //double longitud;
+    bool MostrarVehiculo;
 
     List<Vehicle> vehiculos = new List<Vehicle>();
 
     List<Ubicaciones> ubicaciones = new List<Ubicaciones>();
+
+    List<Vehicle> filtro = new List<Vehicle>();
 
     public void buscarVehiculos()
     {
@@ -51,6 +78,19 @@
     void OnMarkerClick(RadzenGoogleMapMarker marker)
     {
 
+        filtro = vehiculos.Where(
+            x => x.LATITUDE == marker.Position.Lat.ToString() &&
+            x.LONGITUDE == marker.Position.Lng.ToString()
+            ).ToList();
+
+        if (MostrarVehiculo == true)
+        {
+            MostrarVehiculo = false;
+        }
+        else
+        {
+            MostrarVehiculo = true;
+        }
 
 
     }
