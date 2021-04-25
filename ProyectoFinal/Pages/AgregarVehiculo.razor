@@ -1,4 +1,5 @@
 ﻿@page "/agregar_vehiculo"
+@using System.IO
 
 <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
@@ -70,7 +71,8 @@
 
     <div class="mb-3">
         <label for="txtfoto" class="form-label">Foto</label>
-        <input type="file" class="form-control" id="txtfoto" @bind-value="foto">
+        <InputFile OnChange="@LoadFile" />
+        <img src="@foto" alt="photo" width="50px" id="photo">
     </div>
 
     <div class="mb-3">
@@ -82,7 +84,7 @@
         </RadzenGoogleMap>
     </div>
 
-    <button class="btn btn-primary" @onclick="ApiRest">Agregar</button>
+    <button class="btn btn-primary" @onclick="ApiRest" type="button">Agregar</button>
 </form>
 
 
@@ -128,11 +130,10 @@
             PASSENGERS = pasajeros,
             Enrollment = matricula,
             INSURANCE_NO = $"{seguro}",
+            PHOTO = foto,
             LATITUDE = $"{latitud}",
             LONGITUDE = $"{longitud}"
         };
-
-        vehicle.PHOTO = await JS.InvokeAsync<string>("toBase64", "txtfoto");
 
         var jsonBody = JsonConvert.SerializeObject(vehicle);
         var buffer = Encoding.UTF8.GetBytes(jsonBody);
@@ -141,13 +142,28 @@
 
         var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registervehicle", byteContent);
 
-        var content = await response.Content.ReadAsStringAsync();
+        @* var content = await response.Content.ReadAsStringAsync();
 
         var json = JsonConvert.DeserializeObject(content);
 
-        await JS.InvokeVoidAsync("alert", json);
+        await JS.InvokeVoidAsync("alert", json); *@
     }
 
+    public async Task LoadFile(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream());
+
+            string file = await reader.ReadToEndAsync();
+            
+            foto = Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
     public class Vehicle
     {
 

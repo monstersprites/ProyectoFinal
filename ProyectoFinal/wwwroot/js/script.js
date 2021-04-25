@@ -1,14 +1,13 @@
-function toBase64(elementId) {
-    const fileInput = document.getElementById(elementId);
-    
-    const file = fileInput.files[0];
+function toBase64(element) {
+    var file = element.files[0];
+    var reader = new FileReader();
 
-    const reader = new FileReader();
+    reader.onloadend = function() {
+        document.getElementById("photo").src = reader.result;
+    }
     reader.readAsDataURL(file);
-    reader.onloadend = () => {
-        const base64String = reader.result;
-        return base64String;
-    };
+}
 
-    return ""
+window.saveImage = (imgId) => { 
+    return document.getElementById(imgId).src;
 }
