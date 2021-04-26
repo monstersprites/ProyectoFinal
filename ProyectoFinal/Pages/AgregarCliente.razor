@@ -1,6 +1,9 @@
 ﻿@page "/agregar_cliente"
 
 @using System.IO
+@using ProyectoFinal.Data
+@inject CedulaService cedulaService
+@inject NavigationManager uriHelper
 
 <a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
 
@@ -19,7 +22,7 @@
         <input type="text" class="form-control" id="txtcedula" @bind-value="cedula">
     </div>
 
-    <button>Verificar</button>
+    <button class="btn btn-secondary" type="button" @onclick="GetPersona">Verificar</button>
 
     <div class="mb-3">
         <label for="txtnombre" class="form-label">Nombre</label>
@@ -29,6 +32,11 @@
     <div class="mb-3">
         <label for="txtapellido" class="form-label">Apellido</label>
         <input type="text" class="form-control" id="txtapellido" @bind-value="apellido" disabled>
+    </div>
+
+    <div class="mb-3">
+        <label for="txtcorreo" class="form-label">Correo</label>
+        <input type="text" class="form-control" id="txtcorreo" @bind-value="correo">
     </div>
 
     <div class="mb-3">
@@ -61,7 +69,7 @@
         <InputFile OnChange="@LoadFileLicencia" class="form-control" />
     </div>
 
-    <button class="btn btn-primary" @onclick="ApiRest">Agregar</button>
+    <button class="btn btn-primary" @onclick="ApiRest" type="button">Agregar</button>
 
 </form>
 
@@ -106,9 +114,15 @@
 
             var content = await response.Content.ReadAsStringAsync();
 
-            var json = JsonConvert.DeserializeObject(content);
-
-            await JS.InvokeVoidAsync("alert", json);
+            if (response.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("alert", "Registro agregado exitosamente");
+                uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregadp y vuelva a intentar");
+            }
         }
 
         public async Task LoadFilePersona(InputFileChangeEventArgs e)
@@ -140,6 +154,17 @@
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        public async Task GetPersona()
+        {
+            var persona = await cedulaService.GetDatosAsync(cedula);
+
+            if (persona.ok)
+            {
+                nombre = persona.Nombres;
+                apellido = $"{persona.Apellido1} {persona.Apellido2}";
             }
         }
 

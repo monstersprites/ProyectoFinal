@@ -28,7 +28,7 @@ namespace ProyectoFinal
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<CedulaService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
