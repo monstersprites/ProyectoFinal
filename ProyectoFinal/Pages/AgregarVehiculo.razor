@@ -1,5 +1,6 @@
 ﻿@page "/agregar_vehiculo"
 @using System.IO
+@inject NavigationManager uriHelper
 
 <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
@@ -141,11 +142,15 @@
 
         var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registervehicle", byteContent);
 
-        var content = await response.Content.ReadAsStringAsync();
-
-        var json = JsonConvert.DeserializeObject(content);
-
-        await JS.InvokeVoidAsync("alert", json);
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Registro agregado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregadp y vuelva a intentar");
+        }
     }
 
     public async Task LoadFile(InputFileChangeEventArgs e)

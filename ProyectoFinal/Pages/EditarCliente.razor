@@ -1,5 +1,8 @@
 ﻿@page "/editar_cliente"
 
+@using System.IO
+@inject NavigationManager uriHelper
+
 <a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
 
 <br />
@@ -14,7 +17,7 @@
     <label for="txtmatricula">Cédula del cliente</label>
     <input type="text" style="width:200px" class="form-control" placeholder="Cédula del cliente" id="txtmatricula" @bind-value="cedula" />
     <br />
-    <button class="btn btn-primary" @onclick="searchCustomer">Buscar</button>
+    <button class="btn btn-secondary" @onclick="searchCustomer" type="button">Buscar</button>
 </div>
 
 <hr />
@@ -43,15 +46,19 @@
 
     <div class="mb-3">
         <label for="txtfotopersona" class="form-label">Foto de usted </label>
-        <input type="file" class="form-control" id="txtfotopersona" @bind-value="fotopersona">
+        <InputFile OnChange="@LoadFilePersona" class="form-control" id="txtfotopersona" />
+        <br>
+        <img src="@fotopersona" alt="Persona" width="75px">
     </div>
 
     <div class="mb-3">
         <label for="txtfotolicencia" class="form-label">Foto de su licencia de conducir </label>
-        <input type="file" class="form-control" id="txtfotolicencia" @bind-value="fotolicencia">
+        <InputFile OnChange="@LoadFileLicencia" class="form-control" id="txtfotolicencia" />
+        <br>
+        <img src="@fotolicencia" alt="Licencia" width="75px">
     </div>
 
-    <button class="btn btn-primary" @onclick="editCustomer">Agregar</button>
+    <button class="btn btn-primary" @onclick="editCustomer" type="button">Actualizar</button>
 
 </div>
 
@@ -65,26 +72,27 @@
 
     string nacionalidad;
     string tsangre;
+    string licencia;
     string fotopersona;
     string fotolicencia;
 
 
-    public void searchCustomer()
+    public async Task searchCustomer()
     {
 
         String API = $"https://pruebasv4.herokuapp.com/getByID/{cedula}";
 
         WebClient cliente = new WebClient();
 
-        var datos = cliente.DownloadString(API);
+        var datos = await cliente.DownloadStringTaskAsync(API);
 
         var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
 
         nacionalidad = resultados.NATIONALITY;
         tsangre = resultados.BLOODTYPE;
+        licencia = resultados.LICENSE;
         fotopersona = resultados.PHOTOPERSON;
         fotopersona = resultados.PHOTOLICENSE;
-
     }
 
     public async Task editCustomer()
@@ -96,33 +104,63 @@
         {
             NATIONALITY = nacionalidad,
             BLOODTYPE = tsangre,
+            LICENSE = licencia,
             PHOTOPERSON = fotopersona,
             PHOTOLICENSE = fotolicencia
         };
-
-
-        cliente.PHOTOPERSON = await JS.InvokeAsync<string>("toBase64", "txtfoto");
-        cliente.PHOTOLICENSE = await JS.InvokeAsync<string>("toBase64", "txtfoto");
-
 
         var jsonBody = JsonConvert.SerializeObject(cliente);
         var buffer = Encoding.UTF8.GetBytes(jsonBody);
         var byteContent = new ByteArrayContent(buffer);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/updateCustomer/" + cedula, byteContent);
+        var response = await http.PutAsync("https://pruebasv4.herokuapp.com/updateCustomer/" + cedula, byteContent);
 
-        var content = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Registro agregado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregadp y vuelva a intentar");
+        }
+    }
 
-        var json = JsonConvert.DeserializeObject(content);
+    public async Task LoadFilePersona(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream(), true);
 
-        await JS.InvokeVoidAsync("alert", json);
+            string file = await reader.ReadToEndAsync();
+            
+            fotopersona = $"data:{e.File.ContentType};base64," + Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
 
+    public async Task LoadFileLicencia(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream());
+
+            string file = await reader.ReadToEndAsync();
+            
+            fotolicencia = $"data:{e.File.ContentType};base64," + Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     public class Cliente
     {
-
         public string IDENTIFICATION { get; set; }
 
         public string FIRSTNAME { get; set; }
