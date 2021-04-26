@@ -42,7 +42,7 @@
 
         WebClient cliente = new WebClient();
 
-        var datos = cliente.DownloadString(API);
+        var datos = await cliente.DownloadStringTaskAsync(API);
 
         lista_cliente = JsonConvert.DeserializeObject<List<Cliente>>(datos);
 
