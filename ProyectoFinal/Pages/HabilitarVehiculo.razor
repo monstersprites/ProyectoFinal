@@ -1,0 +1,110 @@
+﻿@page "/habilitar_vehiculo"
+
+<a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
+
+<br />
+<br />
+<br />
+
+<h2>Eliminar Vehiculo</h2>
+
+<hr />
+
+<label for="txtcedula"></label>
+<select id="txtcedula" class="form-select" aria-label="Default select example" @bind="matricula">
+    <option selected>Seleccione un cliente</option>
+    @foreach (var v in lista_vehiculos)
+    {
+        <option value="@v.Enrollment">@v.Enrollment</option>
+    }
+</select>
+
+<br />
+<br />
+<br />
+
+
+<button class="btn btn-info" @onclick="habilitarVehiculo">Habilitar</button>
+
+
+
+@code {
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
+
+    string matricula;
+
+    List<Vehicle> lista_vehiculos = new List<Vehicle>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        String API = $"https://pruebasv4.herokuapp.com/AllVehicle";
+
+        WebClient cliente = new WebClient();
+
+        var datos = cliente.DownloadString(API);
+
+        lista_vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos);
+
+    }
+
+    public async Task habilitarVehiculo()
+    {
+
+        var http = new HttpClient();
+
+        var vehiculo = new Vehicle
+        {
+
+        };
+
+        var jsonBody = JsonConvert.SerializeObject(vehiculo);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/enableVehicle/" + matricula, byteContent);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var json = JsonConvert.DeserializeObject(content);
+
+        await JS.InvokeVoidAsync("alert", json);
+
+    }
+
+    public class Vehicle
+    {
+
+        public string BRAND { get; set; }
+
+        public string MODEL { get; set; }
+
+        public int YEAR { get; set; }
+
+        public string COLOUR { get; set; }
+
+        public double PRICEPERDAY { get; set; }
+
+        public string TYPE { get; set; }
+
+        public string LOADCAPACITY { get; set; }
+
+        public int PASSENGERS { get; set; }
+
+        public string Enrollment { get; set; }
+
+        public string INSURANCE_NO { get; set; }
+
+        public string PHOTO { get; set; }
+
+        public string LATITUDE { get; set; }
+
+        public string LONGITUDE { get; set; }
+
+    }
+
+
+}

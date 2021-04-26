@@ -2,7 +2,55 @@
 
 <h3>Gestión de cobros</h3>
 
+<table class="table">
+
+    <tr>
+        <th>ID</th>
+        <th>Reserva</th>
+        <th>Monto</th>
+        <th>Pagado</th>
+    </tr>
+
+    @foreach (var c in cobros)
+    {
+<tr>
+    <td>@c.ID_PAYMENT</td>
+    <td>@c.RESERVATION</td>
+    <td>@c.BILL</td>
+    <td>@c.PAYED</td>
+</tr>
+    }
+
+</table>
+
+<button class="btn btn-info" @onclick="listaCobros">Listar</button>
+
+
 
 @code {
 
+    List<Cobros> cobros = new List<Cobros>();
+
+    public void listaCobros()
+    {
+
+        String API = $"https://pruebasv4.herokuapp.com/getAllPaymets";
+
+        WebClient cliente = new WebClient();
+
+        var datos = cliente.DownloadString(API);
+
+        cobros = JsonConvert.DeserializeObject<List<Cobros>>(datos);
+
+    }
+
+    public class Cobros
+    {
+
+        public int ID_PAYMENT { get; set; }
+        public int RESERVATION { get; set; }
+        public double BILL { get; set; }
+        public int PAYED { get; set; }
+
+    }
 }

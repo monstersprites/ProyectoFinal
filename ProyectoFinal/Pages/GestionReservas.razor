@@ -3,8 +3,12 @@
 <h3>Gestión de reservas</h3>
 
 <label for="txtvehiculo"></label>
-<select id="txtvehiculo" @bind="vehiculo">
+<select id="txtvehiculo" @bind="matricula">
     <option selected>Seleccione un vehiculo</option>
+    @foreach (var v in vehiculos)
+    {
+        <option value="@v.Enrollment">@v.BRAND @v.MODEL</option>
+    }
 </select>
 
 <br />
@@ -37,42 +41,53 @@
 
 @code {
 
-    string vehiculo;
+        string matricula;
 
-    string cedula_cliente;
+        string cedula_cliente;
 
-    DateTime fecha_inicio;
+        DateTime fecha_inicio;
 
-    DateTime fecha_final;
+        DateTime fecha_final;
 
-    List<Cliente> clientes = new List<Cliente>();
+        List<Cliente> clientes = new List<Cliente>();
 
-    protected override async Task OnInitializedAsync()
-    {
+        List<Vehicle> vehiculos = new List<Vehicle>();
 
-        String API = $"https://pruebasv4.herokuapp.com/AllClient";
+        protected override async Task OnInitializedAsync()
+        {
 
-        WebClient cliente = new WebClient();
+            String API = $"https://pruebasv4.herokuapp.com/AllClient";
+            String API2 = $"https://pruebasv4.herokuapp.com/avaibleVehicles";
 
-        var datos = cliente.DownloadString(API);
+            WebClient cliente = new WebClient();
 
-        clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos);
+            var datos1 = cliente.DownloadString(API);
+            var datos2 = cliente.DownloadString(API2);
 
-    }
+            clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos1);
 
-    public void reservarVehiculo()
-    {
+            vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos2);
+        }
 
-        //String API = $"https://pruebasv4.herokuapp.com/getByID/{cedula_cliente}";
+        public async Task reservarVehiculo()
+        {
 
-        //WebClient cliente = new WebClient();
+            var http = new HttpClient();
 
-        //var datos = cliente.DownloadString(API);
+            var reserva = new Reserva
+            {
+                vehicle = matricula,
+                client = cedula_cliente,
+                startdate = fecha_inicio.ToString(),
+                endingdate = fecha_final.ToString()
+        };
 
-        //var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
+        var jsonBody = JsonConvert.SerializeObject(reserva);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-        //cliente = resultados;
-
+        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registrationReservation", byteContent);
 
     }
 
@@ -99,4 +114,45 @@
 
     }
 
+    public class Vehicle
+    {
+
+        public string BRAND { get; set; }
+
+        public string MODEL { get; set; }
+
+        public int YEAR { get; set; }
+
+        public string COLOUR { get; set; }
+
+        public double PRICEPERDAY { get; set; }
+
+        public string TYPE { get; set; }
+
+        public string LOADCAPACITY { get; set; }
+
+        public int PASSENGERS { get; set; }
+
+        public string Enrollment { get; set; }
+
+        public string INSURANCE_NO { get; set; }
+
+        public string PHOTO { get; set; }
+
+        public string LATITUDE { get; set; }
+
+        public string LONGITUDE { get; set; }
+
+    }
+
+    public class Reserva
+    {
+        public string vehicle { get; set; }
+
+        public string client { get; set; }
+
+        public string startdate { get; set; }
+
+        public string endingdate { get; set; }
+    }
 }
