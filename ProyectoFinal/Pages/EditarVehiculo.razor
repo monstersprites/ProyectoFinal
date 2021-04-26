@@ -1,5 +1,8 @@
 ﻿@page "/editar_vehiculo"
 
+@using System.IO
+@inject NavigationManager uriHelper
+
 <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
 <br />
@@ -77,7 +80,7 @@
 
     <div class="mb-3">
         <label for="txtfoto" class="form-label">Foto</label>
-        <input type="file" class="form-control" id="txtfoto" @bind-value="foto">
+        <InputFile OnChange="@LoadFile" />
     </div>
 
     <div class="mb-3">
@@ -106,7 +109,7 @@
     int año;
     string color;
     double precio;
-    string tipo;
+    string tipo = "Carro";
     int capacidad;
     int pasajeros;
     long seguro;
@@ -144,7 +147,6 @@
         foto = resultados.PHOTO;
         latitud = double.Parse(resultados.LATITUDE);
         longitud = double.Parse(resultados.LONGITUDE);
-
     }
 
     public async Task editVehicle()
@@ -163,26 +165,43 @@
             LOADCAPACITY = $"{capacidad}",
             PASSENGERS = pasajeros,
             INSURANCE_NO = $"{seguro}",
+            PHOTO = foto,
             LATITUDE = $"{latitud}",
             LONGITUDE = $"{longitud}"
         };
-
-
-        vehicle.PHOTO = await JS.InvokeAsync<string>("toBase64", "txtfoto");
 
         var jsonBody = JsonConvert.SerializeObject(vehicle);
         var buffer = Encoding.UTF8.GetBytes(jsonBody);
         var byteContent = new ByteArrayContent(buffer);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/updatevehicle/"+matricula, byteContent);
+        var response = await http.PutAsync("https://pruebasv4.herokuapp.com/updatevehicle/"+matricula, byteContent);
 
-        var content = await response.Content.ReadAsStringAsync();
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Registro editado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
+        }
+    }
 
-        var json = JsonConvert.DeserializeObject(content);
+    public async Task LoadFile(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream());
 
-        await JS.InvokeVoidAsync("alert", json);
+            string file = await reader.ReadToEndAsync();
 
+            foto = $"data:{e.File.ContentType};base64," + Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     public class Vehicle

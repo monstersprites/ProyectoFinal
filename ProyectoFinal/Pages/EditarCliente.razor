@@ -118,14 +118,13 @@
 
         if (response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "Registro agregado exitosamente");
+            await JS.InvokeVoidAsync("alert", "Registro editado exitosamente");
             uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregadp y vuelva a intentar");
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
         }
-
     }
 
     public async Task LoadFilePersona(InputFileChangeEventArgs e)

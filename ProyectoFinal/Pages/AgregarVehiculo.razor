@@ -1,4 +1,5 @@
 ﻿@page "/agregar_vehiculo"
+
 @using System.IO
 @inject NavigationManager uriHelper
 
@@ -151,7 +152,7 @@
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregadp y vuelva a intentar");
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
         }
     }
 
@@ -163,7 +164,7 @@
 
             string file = await reader.ReadToEndAsync();
 
-            foto = Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+            foto = $"data:{e.File.ContentType};base64," + Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
         }
         catch (Exception ex)
         {
