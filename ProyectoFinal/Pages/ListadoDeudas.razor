@@ -1,22 +1,70 @@
 ﻿@page "/ListadoDeudas"
 
 
-    <a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
+<a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
 
-    <h3>Listado de deudas</h3>
+<br />
+<br />
 
-    <table>
+
+<h3>Listado de deudas</h3>
+
+<br />
+<br />
+
+
+<button class="btn btn-info" @onclick="listaDeudas">Listar deudas</button>
+
+@if (deudas != null)
+{
+    <table class="table">
 
         <tr>
-            <th></th>
+            <th>Cédula</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Deuda</th>
         </tr>
 
-        <tr>
-            <td></td>
-        </tr>
+        @foreach (var d in deudas)
+        {
+            <tr>
+                <td>@d.IDENTIFICATION</td>
+                <td>@d.FIRSTNAME</td>
+                <td>@d.LASTNAME</td>
+                <td>@d.TOTAL_DEBD</td>
+            </tr>
+        }
 
     </table>
+}
 
-    @code {
+@code {
+
+    List<Deudas> deudas = new List<Deudas>();
+
+    public void listaDeudas()
+    {
+
+        String API = $"https://pruebasv4.herokuapp.com/clientsDebd";
+
+        WebClient cliente = new WebClient();
+
+        var datos = cliente.DownloadString(API);
+
+        deudas = JsonConvert.DeserializeObject<List<Deudas>>(datos);
 
     }
+
+
+    public class Deudas
+    {
+        public string IDENTIFICATION { get; set; }
+        public string FIRSTNAME { get; set; }
+        public string LASTNAME { get; set; }
+        public double TOTAL_DEBD { get; set; }
+    }
+
+
+
+}

@@ -2,6 +2,8 @@
 
 <h3>Gestión de cobros</h3>
 
+<button class="btn btn-info" @onclick="listaCobros">Listar</button>
+
 <table class="table">
 
     <tr>
@@ -13,21 +15,35 @@
 
     @foreach (var c in cobros)
     {
-<tr>
-    <td>@c.ID_PAYMENT</td>
-    <td>@c.RESERVATION</td>
-    <td>@c.BILL</td>
-    <td>@c.PAYED</td>
-</tr>
+        <tr>
+            <td>@c.ID_PAYMENT</td>
+            <td>@c.RESERVATION</td>
+            <td>@c.BILL</td>
+            <td>@c.PAYED</td>
+        </tr>
     }
 
 </table>
 
-<button class="btn btn-info" @onclick="listaCobros">Listar</button>
+<br />
 
+<hr />
 
+<h4>Pagar</h4>
+<br />
+<br />
+<input type="number" placeholder="Id del pago" @bind-value="id_pago"/>
+<br />
+<br />
+<input type="number" placeholder="Cantidad a pagar" @bind-value="pago" />
+<br />
+<br />
+<button class="btn btn-secondary" @onclick="pagar">Realizar pago</button>
 
 @code {
+
+    string id_pago;
+    int pago;
 
     List<Cobros> cobros = new List<Cobros>();
 
@@ -44,6 +60,24 @@
 
     }
 
+    public async Task pagar()
+    {
+        var http = new HttpClient();
+
+        var a_pagar = new Pago
+        {
+           PaymentId = id_pago,
+           Pay = pago
+        };
+
+        var jsonBody = JsonConvert.SerializeObject(a_pagar);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/updatePayment", byteContent);
+    }
+
     public class Cobros
     {
 
@@ -53,4 +87,11 @@
         public int PAYED { get; set; }
 
     }
+
+    public class Pago
+    {
+        public string PaymentId { get; set; }
+        public int Pay { get; set; }
+    }
+
 }

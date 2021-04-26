@@ -8,15 +8,61 @@
     <table>
 
         <tr>
-            <th></th>
+            <th>Vehículo</th>
+            <th>Cantidad de veces reservadas</th>
+            <th>Ganancias generadas</th>
         </tr>
 
-        <tr>
-            <td></td>
-        </tr>
+        @foreach(var b in resultados)
+            {
+
+    <tr>
+        <td>@b.BRAND @b.MODEL</td>
+        <td>@b.TOTAL_RESERVATIONS</td>
+        <td>@b.TOTAL_BILL</td>
+    </tr>
+
+            }
+        
 
     </table>
 
     @code {
+
+        List<Beneficios> resultados = new List<Beneficios>();
+
+        public void buscarBeneficios()
+        {
+
+            String API = $"https://pruebasv4.herokuapp.com/benefitList";
+
+            WebClient cliente = new WebClient();
+
+            var datos = cliente.DownloadString(API);
+
+            resultados = JsonConvert.DeserializeObject<List<Beneficios>>(datos);
+
+        }
+
+        public class Beneficios
+        {
+            public int BRAND { get; set; }
+            public string MODEL { get; set; }
+            public string YEAR { get; set; }
+            public int COLOUR { get; set; }
+            public string PRICEPERDAY { get; set; }
+            public double TYPE { get; set; }
+            public string LOADCAPACITY { get; set; }
+            public string PASSENGERS { get; set; }
+            public int Enrollment { get; set; }
+            public string INSURANCE_NO { get; set; }
+            public string PHOTO { get; set; }
+            public string LATITUDE { get; set; }
+            public string LONGITUDE { get; set; }
+            public string CONDITION { get; set; }
+            public int TOTAL_RESERVATIONS { get; set; }
+            public int TOTAL_BILL { get; set; }
+        }
+
 
     }
