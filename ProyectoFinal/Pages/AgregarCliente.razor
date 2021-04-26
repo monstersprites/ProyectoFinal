@@ -45,6 +45,11 @@
     </div>
 
     <div class="mb-3">
+        <label for="txtlicencia" class="form-label">Licencia</label>
+        <input type="text" class="form-control" id="txtlicencia" @bind-value="licencia">
+    </div>
+
+    <div class="mb-3">
         <label for="txtsangre" class="form-label">Tipo de sangre:</label>
         <select id="txtsangre" @bind="tsangre">
             <option value="null" selected>Seleccione el tipo de sangre</option>
@@ -86,7 +91,7 @@
         string tsangre;
         string fotopersona;
         string fotolicencia;
-
+        string licencia;
 
         public async Task ApiRest()
         {
@@ -102,7 +107,7 @@
                 BLOODTYPE = tsangre,
                 PHOTOPERSON = fotopersona,
                 PHOTOLICENSE = fotolicencia,
-                LICENSE = ""
+                LICENSE = licencia
             };
 
             var jsonBody = JsonConvert.SerializeObject(cliente);
