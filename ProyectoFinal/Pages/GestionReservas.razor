@@ -2,21 +2,14 @@
 
 <h3>Gestión de reservas</h3>
 
-<label for="txtvehiculo"></label>
-<select id="txtvehiculo" @bind="vehiculo">
-    <option selected>Seleccione un vehiculo</option>
-</select>
-
-<br />
-<br />
-
-<label for="txtcedula"></label>
-<select id="txtcedula" @bind="cedula_cliente">
-    <option selected>Seleccione un cliente</option>
-    @foreach (var c in clientes) { 
-        <option value="@c.IDENTIFICATION">@c.IDENTIFICATION</option>
-    }
-</select>
+@*<label for="txtvehiculo"></label>
+    <select id="txtvehiculo" @bind="matricula">
+        <option selected>Seleccione un vehiculo</option>
+        @foreach (var v in vehiculos)
+        {
+            <option value="@v.Enrollment">@v.BRAND @v.MODEL</option>
+        }
+    </select>*@
 
 <br />
 <br />
@@ -30,6 +23,36 @@
 <label for="txtfechafin">Fecha final:</label>
 <input type="date" id="txtfechafin" @bind-value="fecha_final" />
 
+
+<br />
+<br />
+
+<button class="btn btn-secondary" @onclick="buscarVehiculos">Buscar vehiculos</button>
+
+<br />
+<br />
+
+<label for="txtvehiculo"></label>
+<select id="txtvehiculo" @bind="matricula">
+    <option selected>Seleccione un vehiculo</option>
+    @foreach (var v in vehiculos)
+    {
+        <option value="@v.Enrollment">@v.BRAND @v.MODEL</option>
+    }
+</select>
+
+<br />
+<br />
+
+<label for="txtcedula"></label>
+<select id="txtcedula" @bind="cedula_cliente">
+    <option selected>Seleccione un cliente</option>
+    @foreach (var c in clientes)
+    {
+        <option value="@c.IDENTIFICATION">@c.IDENTIFICATION</option>
+    }
+</select>
+
 <br />
 <br />
 
@@ -37,7 +60,7 @@
 
 @code {
 
-    string vehiculo;
+    string matricula;
 
     string cedula_cliente;
 
@@ -47,32 +70,59 @@
 
     List<Cliente> clientes = new List<Cliente>();
 
+    List<Vehicle> vehiculos = new List<Vehicle>();
+
     protected override async Task OnInitializedAsync()
     {
 
         String API = $"https://pruebasv4.herokuapp.com/AllClient";
+        //String API2 = $"https://pruebasv4.herokuapp.com/avaibleVehicles";
 
         WebClient cliente = new WebClient();
 
-        var datos = await cliente.DownloadStringTaskAsync(API);
+        var datos1 = cliente.DownloadString(API);
+        //var datos2 = cliente.DownloadString(API2);
 
-        clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos);
+        clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos1);
 
+        //vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos2);
     }
 
-    public void reservarVehiculo()
+    public void buscarVehiculos()
     {
 
-        //String API = $"https://pruebasv4.herokuapp.com/getByID/{cedula_cliente}";
+        string fecha1 = fecha_inicio.ToString();
 
-        //WebClient cliente = new WebClient();
+        string fecha2 = fecha_final.ToString();
 
-        //var datos = cliente.DownloadString(API);
+        String API = $"https://pruebasv4.herokuapp.com/avaibleVehicles/{fecha1}/{fecha2}";
 
-        //var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
+        WebClient cliente = new WebClient();
 
-        //cliente = resultados;
+        var datos1 = cliente.DownloadString(API);
 
+        vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos1);
+    }
+
+    public async Task reservarVehiculo()
+    {
+
+        var http = new HttpClient();
+
+        var reserva = new Reserva
+        {
+            vehicle = matricula,
+            client = cedula_cliente,
+            startdate = fecha_inicio.ToString(),
+            endingdate = fecha_final.ToString()
+        };
+
+        var jsonBody = JsonConvert.SerializeObject(reserva);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registrationReservation", byteContent);
 
     }
 
@@ -99,4 +149,45 @@
 
     }
 
+    public class Vehicle
+    {
+
+        public string BRAND { get; set; }
+
+        public string MODEL { get; set; }
+
+        public int YEAR { get; set; }
+
+        public string COLOUR { get; set; }
+
+        public double PRICEPERDAY { get; set; }
+
+        public string TYPE { get; set; }
+
+        public string LOADCAPACITY { get; set; }
+
+        public int PASSENGERS { get; set; }
+
+        public string Enrollment { get; set; }
+
+        public string INSURANCE_NO { get; set; }
+
+        public string PHOTO { get; set; }
+
+        public string LATITUDE { get; set; }
+
+        public string LONGITUDE { get; set; }
+
+    }
+
+    public class Reserva
+    {
+        public string vehicle { get; set; }
+
+        public string client { get; set; }
+
+        public string startdate { get; set; }
+
+        public string endingdate { get; set; }
+    }
 }

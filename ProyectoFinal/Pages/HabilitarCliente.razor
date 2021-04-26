@@ -1,0 +1,99 @@
+﻿@page "/habilitar_cliente"
+
+<a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
+
+<br />
+<br />
+<br />
+
+<h3>Habilitar cliente</h3>
+
+<hr />
+
+<label for="txtcedula"></label>
+<select id="txtcedula" class="form-select" aria-label="Default select example" @bind="cedula_cliente">
+    <option selected>Seleccione un cliente</option>
+    @foreach (var c in lista_cliente)
+    {
+        <option value="@c.IDENTIFICATION">@c.IDENTIFICATION</option>
+    }
+</select>
+
+<br />
+<br />
+<br />
+
+<button class="btn btn-info" @onclick="habilitarCliente">Habilitar</button>
+
+
+@code {
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
+
+    string cedula_cliente;
+
+    List<Cliente> lista_cliente = new List<Cliente>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        String API = $"https://pruebasv4.herokuapp.com/AllClient";
+
+        WebClient cliente = new WebClient();
+
+        var datos = cliente.DownloadString(API);
+
+        lista_cliente = JsonConvert.DeserializeObject<List<Cliente>>(datos);
+
+    }
+
+    public async Task habilitarCliente()
+    {
+
+        var http = new HttpClient();
+
+        var cliente = new Cliente
+        {
+
+        };
+
+        var jsonBody = JsonConvert.SerializeObject(cliente);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/enableClient/" + cedula_cliente, byteContent);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var json = JsonConvert.DeserializeObject(content);
+
+        await JS.InvokeVoidAsync("alert", json);
+
+    }
+
+    public class Cliente
+    {
+
+        public string IDENTIFICATION { get; set; }
+
+        public string FIRSTNAME { get; set; }
+
+        public string LASTNAME { get; set; }
+
+        public string EMAIL { get; set; }
+
+        public string LICENSE { get; set; }
+
+        public string NATIONALITY { get; set; }
+
+        public string BLOODTYPE { get; set; }
+
+        public string PHOTOPERSON { get; set; }
+
+        public string PHOTOLICENSE { get; set; }
+
+    }
+
+}

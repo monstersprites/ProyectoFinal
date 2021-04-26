@@ -1,51 +1,107 @@
 ﻿@page "/ListadoVehiculos"
 
-    <a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
+<a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
+
+<br />
+<br />
+
+<h3>Listado de Vehiculos</h3>
+<hr />
+
+<br />
+<br />
+
+<label for="txtfechainicio">Fecha inicio:</label>
+<input type="date" id="txtfechainicio" @bind-value="fecha_inicio" />
+
+<br />
+<br />
+
+<label for="txtfechafin">Fecha final:</label>
+<input type="date" id="txtfechafin" @bind-value="fecha_final" />
 
 
-    <h3>Listado de Vehiculos</h3>
 
-<button class="btn btn-info" ></button>
-
-    @code {
-
-        List<Vehicle> resultados = new List<Vehicle>();
-
-        public void buscarVehiculos()
-        {
-
-        }
+<button class="btn btn-info">Listar vehiculos</button>
 
 
-        public class Vehicle
-        {
+@if (resultados != null)
+{
+    @foreach (var r in resultados)
+    {
+        <div class="card" style="width: 18rem;">
+            <img src="" class="card-img-top">
+            <div class="card-body">
+                <h5 class="card-title">@r.BRAND  @r.MODEL</h5>
+                <p class="card-text">Matricula: @r.Enrollment</p>
+                <p class="card-text">Color: @r.COLOUR</p>
+                <p class="card-text">Cantidad de pasajeros: @r.PASSENGERS</p>
+                <p class="card-text">Capacidad de carga: @r.LOADCAPACITY Kgs</p>
+                <p class="card-text">Precio por día: @r.PRICEPERDAY</p>
+                <p class="card-text">Número de seguro: @r.INSURANCE_NO</p>
+            </div>
+        </div>
+    }
 
-            public string BRAND { get; set; }
+}   else{
+    <p>No hay vehiculos disponibles en esa fecha</p>
+       }
 
-            public string MODEL { get; set; }
 
-            public int YEAR { get; set; }
+@code {
 
-            public string COLOUR { get; set; }
+    DateTime fecha_inicio;
 
-            public double PRICEPERDAY { get; set; }
+    DateTime fecha_final;
 
-            public string TYPE { get; set; }
+    List<Vehicle> resultados = new List<Vehicle>();
 
-            public string LOADCAPACITY { get; set; }
+    public void buscarVehiculos()
+    {
+        string fecha1 = fecha_inicio.ToString();
 
-            public int PASSENGERS { get; set; }
+        string fecha2 = fecha_final.ToString();
 
-            public string Enrollment { get; set; }
+        String API = $"https://pruebasv4.herokuapp.com/avaibleVehicles/{fecha1}/{fecha2}";
 
-            public string INSURANCE_NO { get; set; }
+        WebClient cliente = new WebClient();
 
-            public string PHOTO { get; set; }
+        var datos1 = cliente.DownloadString(API);
 
-            public string LATITUDE { get; set; }
-
-            public string LONGITUDE { get; set; }
-
-        }
+        resultados = JsonConvert.DeserializeObject<List<Vehicle>>(datos1);
 
     }
+
+
+    public class Vehicle
+    {
+
+        public string BRAND { get; set; }
+
+        public string MODEL { get; set; }
+
+        public int YEAR { get; set; }
+
+        public string COLOUR { get; set; }
+
+        public double PRICEPERDAY { get; set; }
+
+        public string TYPE { get; set; }
+
+        public string LOADCAPACITY { get; set; }
+
+        public int PASSENGERS { get; set; }
+
+        public string Enrollment { get; set; }
+
+        public string INSURANCE_NO { get; set; }
+
+        public string PHOTO { get; set; }
+
+        public string LATITUDE { get; set; }
+
+        public string LONGITUDE { get; set; }
+
+    }
+
+}
