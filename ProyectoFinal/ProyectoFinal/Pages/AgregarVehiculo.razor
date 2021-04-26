@@ -1,5 +1,6 @@
 ﻿@page "/agregar_vehiculo"
 @using System.IO
+@inject NavigationManager uriHelper
 
 <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
@@ -106,7 +107,7 @@
     string foto;
     double latitud;
     double longitud;
-    
+
     void OnMapClick(GoogleMapClickEventArgs args)
     {
         latitud = args.Position.Lat;
@@ -143,9 +144,15 @@
 
         var content = await response.Content.ReadAsStringAsync();
 
-        var json = JsonConvert.DeserializeObject(content);
-
-        await JS.InvokeVoidAsync("alert", json);
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Registro agregado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregadp y vuelva a intentar");
+        }
     }
 
     public async Task LoadFile(InputFileChangeEventArgs e)
@@ -155,7 +162,7 @@
             using var reader = new StreamReader(e.File.OpenReadStream());
 
             string file = await reader.ReadToEndAsync();
-            
+
             foto = Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
         }
         catch (Exception ex)
@@ -163,6 +170,7 @@
             Console.WriteLine(ex.Message);
         }
     }
+    
     public class Vehicle
     {
 
