@@ -107,7 +107,7 @@
     string foto;
     double latitud;
     double longitud;
-    
+
     void OnMapClick(GoogleMapClickEventArgs args)
     {
         latitud = args.Position.Lat;
@@ -142,6 +142,8 @@
 
         var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registervehicle", byteContent);
 
+        var content = await response.Content.ReadAsStringAsync();
+
         if (response.IsSuccessStatusCode)
         {
             await JS.InvokeVoidAsync("alert", "Registro agregado exitosamente");
@@ -160,7 +162,7 @@
             using var reader = new StreamReader(e.File.OpenReadStream());
 
             string file = await reader.ReadToEndAsync();
-            
+
             foto = Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
         }
         catch (Exception ex)
@@ -168,6 +170,7 @@
             Console.WriteLine(ex.Message);
         }
     }
+    
     public class Vehicle
     {
 
