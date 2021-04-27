@@ -85,20 +85,27 @@
 
         String API = $"https://pruebasv4.herokuapp.com/getByID/{cedula}";
 
-        WebClient cliente = new WebClient();
+        var http = new HttpClient();
 
-        var datos = await cliente.DownloadStringTaskAsync(API);
+        var datos = await http.GetAsync(API);
 
-        var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
-        
-        nombre = resultados.FIRSTNAME;
-        apellido = resultados.LASTNAME;
-        correo = resultados.EMAIL;
-        nacionalidad = resultados.NATIONALITY;
-        tsangre = resultados.BLOODTYPE;
-        licencia = resultados.LICENSE;
-        fotopersona = resultados.PHOTOPERSON;
-        fotopersona = resultados.PHOTOLICENSE;
+        if (datos.IsSuccessStatusCode)
+        {
+            var resultados = JsonConvert.DeserializeObject<Cliente>(await datos.Content.ReadAsStringAsync());
+            
+            nombre = resultados.FIRSTNAME;
+            apellido = resultados.LASTNAME;
+            correo = resultados.EMAIL;
+            nacionalidad = resultados.NATIONALITY;
+            tsangre = resultados.BLOODTYPE;
+            licencia = resultados.LICENSE;
+            fotopersona = resultados.PHOTOPERSON;
+            fotopersona = resultados.PHOTOLICENSE;
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Esa cedula no esta en el sistema, revise y vuelva a intentar");
+        }
     }
 
     public async Task editCustomer()
