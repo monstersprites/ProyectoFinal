@@ -1,0 +1,185 @@
+﻿@page "/editar_cliente"
+
+@using System.IO
+@inject NavigationManager uriHelper
+
+<a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
+
+<br />
+<br />
+<br />
+
+<h3>Editar cliente</h3>
+
+<hr />
+
+<div class="m-3">
+    <label for="txtmatricula">Cédula del cliente</label>
+    <input type="text" style="width:200px" class="form-control" placeholder="Cédula del cliente" id="txtmatricula" @bind-value="cedula" />
+    <br />
+    <button class="btn btn-primary" @onclick="searchCustomer">Buscar</button>
+</div>
+
+<hr />
+
+<div class="container">
+
+    <div class="mb-3">
+        <label for="txtnacionalidad" class="form-label">Nacionalidad</label>
+        <input type="text" class="form-control" id="txtnacionalidad" @bind-value="nacionalidad">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtlicencia" class="form-label">Licencia</label>
+        <input type="text" class="form-control" id="txtlicencia" @bind-value="licencia">
+    </div>
+
+    <div class="mb-3">
+        <label for="txtsangre" class="form-label">Tipo de sangre:</label>
+        <select id="txtsangre" @bind="tsangre">
+            <option value="null" selected>Seleccione el tipo de sangre</option>
+            <option value="O negativo">O negativo</option>
+            <option value="O positivo">O positivo</option>
+            <option value="A negativo">A negativo</option>
+            <option value="A positivo">A positivo</option>
+            <option value="B negativo">B negativo</option>
+            <option value="B positivo">B positivo</option>
+            <option value="AB negativo">AB negativo</option>
+            <option value="AB positivo">AB positivo</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="txtfotopersona" class="form-label">Foto de usted </label>
+        <InputFile OnChange="@LoadFilePersona" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label for="txtfotolicencia" class="form-label">Foto de su licencia de conducir </label>
+        <InputFile OnChange="@LoadFileLicencia" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" @onclick="editCustomer">Agregar</button>
+
+</div>
+
+@code {
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
+
+
+    string cedula;
+
+    string nacionalidad;
+    string tsangre;
+    string licencia;
+    string fotopersona;
+    string fotolicencia;
+
+
+    public async Task searchCustomer()
+    {
+
+        String API = $"https://pruebasv4.herokuapp.com/getByID/{cedula}";
+
+        WebClient cliente = new WebClient();
+
+        var datos = await cliente.DownloadStringTaskAsync(API);
+
+        var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
+
+        nacionalidad = resultados.NATIONALITY;
+        tsangre = resultados.BLOODTYPE;
+        licencia = resultados.LICENSE;
+        fotopersona = resultados.PHOTOPERSON;
+        fotopersona = resultados.PHOTOLICENSE;
+    }
+
+    public async Task editCustomer()
+    {
+
+        var http = new HttpClient();
+
+        var cliente = new Cliente
+        {
+            NATIONALITY = nacionalidad,
+            BLOODTYPE = tsangre,
+            PHOTOPERSON = fotopersona,
+            PHOTOLICENSE = fotolicencia
+        };
+
+        var jsonBody = JsonConvert.SerializeObject(cliente);
+        var buffer = Encoding.UTF8.GetBytes(jsonBody);
+        var byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var response = await http.PutAsync("https://pruebasv4.herokuapp.com/updateCustomer/" + cedula, byteContent);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Registro editado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
+        }
+    }
+
+    public async Task LoadFilePersona(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream());
+
+            string file = await reader.ReadToEndAsync();
+            
+            fotopersona = $"data:{e.File.ContentType};base64," + Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public async Task LoadFileLicencia(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream());
+
+            string file = await reader.ReadToEndAsync();
+            
+            fotolicencia = $"data:{e.File.ContentType};base64," + Convert.ToBase64String(Encoding.ASCII.GetBytes(file));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public class Cliente
+    {
+
+        public string IDENTIFICATION { get; set; }
+
+        public string FIRSTNAME { get; set; }
+
+        public string LASTNAME { get; set; }
+
+        public string EMAIL { get; set; }
+
+        public string LICENSE { get; set; }
+
+        public string NATIONALITY { get; set; }
+
+        public string BLOODTYPE { get; set; }
+
+        public string PHOTOPERSON { get; set; }
+
+        public string PHOTOLICENSE { get; set; }
+
+    }
+
+}
