@@ -70,7 +70,9 @@
 
 
     string cedula;
-
+    string nombre;
+    string apellido;
+    string correo;
     string nacionalidad;
     string tsangre;
     string licencia;
@@ -88,7 +90,10 @@
         var datos = await cliente.DownloadStringTaskAsync(API);
 
         var resultados = JsonConvert.DeserializeObject<Cliente>(datos);
-
+        
+        nombre = resultados.FIRSTNAME;
+        apellido = resultados.LASTNAME;
+        correo = resultados.EMAIL;
         nacionalidad = resultados.NATIONALITY;
         tsangre = resultados.BLOODTYPE;
         licencia = resultados.LICENSE;
@@ -103,10 +108,15 @@
 
         var cliente = new Cliente
         {
+            IDENTIFICATION = cedula,
+            FIRSTNAME = nombre,
+            LASTNAME = apellido,
+            EMAIL = correo,
             NATIONALITY = nacionalidad,
             BLOODTYPE = tsangre,
             PHOTOPERSON = fotopersona,
-            PHOTOLICENSE = fotolicencia
+            PHOTOLICENSE = fotolicencia,
+            LICENSE = licencia
         };
 
         var jsonBody = JsonConvert.SerializeObject(cliente);

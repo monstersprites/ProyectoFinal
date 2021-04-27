@@ -87,12 +87,12 @@
         <label for="map" class="form-label">Seleccione una ubicacion en el mapa</label>
         <RadzenGoogleMap id="map" style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 18.98367097987177, Lng = -70.45763034294242 }) MapClick=@OnMapClick>
             <Markers>
-                <RadzenGoogleMapMarker Position=@(new GoogleMapPosition() { Lat = latitud, Lng=longitud }) />
+                <RadzenGoogleMapMarker Position=@(new GoogleMapPosition() { Lat = latitud, Lng= longitud }) />
             </Markers>
         </RadzenGoogleMap>
     </div>
 
-    <button class="btn btn-info">Editar</button>
+    <button class="btn btn-info" @onclick=editVehicle>Editar</button>
 
 </div>
 
@@ -124,14 +124,14 @@
         longitud = args.Position.Lng;
     }
 
-    public void searchVehicle()
+    public async Task searchVehicle()
     {
 
         String API = $"https://pruebasv4.herokuapp.com/SearchEnrollment/{matricula}";
 
         WebClient cliente = new WebClient();
 
-        var datos = cliente.DownloadString(API);
+        var datos = await cliente.DownloadStringTaskAsync(API);
 
         var resultados = JsonConvert.DeserializeObject<Vehicle>(datos);
 
@@ -141,12 +141,12 @@
         color = resultados.COLOUR;
         precio = resultados.PRICEPERDAY;
         tipo = resultados.TYPE;
-        capacidad = int.Parse(resultados.LOADCAPACITY);
+        capacidad = (int.TryParse(resultados.LOADCAPACITY, out int number)) ? number : number;
         pasajeros = resultados.PASSENGERS;
-        seguro = long.Parse(resultados.INSURANCE_NO);
+        seguro = (long.TryParse(resultados.INSURANCE_NO, out long number2)) ? number2 : number2;
         foto = resultados.PHOTO;
-        latitud = double.Parse(resultados.LATITUDE);
-        longitud = double.Parse(resultados.LONGITUDE);
+        latitud = (double.TryParse(resultados.LATITUDE, out double number3)) ? number3 : number3;
+        longitud = (double.TryParse(resultados.LONGITUDE, out double number4)) ? number4 : number4;
     }
 
     public async Task editVehicle()
@@ -165,6 +165,7 @@
             LOADCAPACITY = $"{capacidad}",
             PASSENGERS = pasajeros,
             INSURANCE_NO = $"{seguro}",
+            Enrollment = matricula,
             PHOTO = foto,
             LATITUDE = $"{latitud}",
             LONGITUDE = $"{longitud}"
