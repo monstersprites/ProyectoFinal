@@ -7,11 +7,128 @@
 namespace ProyectoFinal.Pages
 {
     #line hidden
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components;
+#nullable restore
+#line 1 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Microsoft.AspNetCore.Authorization;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 2 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Microsoft.AspNetCore.Components.Authorization;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 3 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Microsoft.AspNetCore.Components.Forms;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 4 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Microsoft.AspNetCore.Components.Routing;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 5 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Microsoft.AspNetCore.Components.Web;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 6 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Microsoft.JSInterop;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 7 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using ProyectoFinal;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 8 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using ProyectoFinal.Shared;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 9 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Radzen;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 10 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Radzen.Blazor;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 11 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using Newtonsoft.Json;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 12 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using System.Net;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 13 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using System.Net.Http;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 14 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using System.Net.Http.Headers;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 15 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using System;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 16 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using System.Text;
+
+#line default
+#line hidden
+#nullable disable
+#nullable restore
+#line 17 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/_Imports.razor"
+using System.Threading.Tasks;
+
+#line default
+#line hidden
+#nullable disable
 #nullable restore
 #line 3 "/home/elmer/Desktop/tareas_de_p3/ProyectoFinal/ProyectoFinal/Pages/EditarCliente.razor"
 using System.IO;
