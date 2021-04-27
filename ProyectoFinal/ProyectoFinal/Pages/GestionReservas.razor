@@ -81,27 +81,25 @@
         WebClient cliente = new WebClient();
 
         var datos1 = cliente.DownloadString(API);
-        //var datos2 = cliente.DownloadString(API2);
-
+       
         clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos1);
 
-        //vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos2);
     }
 
     public void buscarVehiculos()
     {
 
-        string fecha1 = fecha_inicio.ToString();
+       // string fecha1 = fecha_inicio.ToString();
 
-        string fecha2 = fecha_final.ToString();
+       // string fecha2 = fecha_final.ToString();
 
-        String API = $"https://pruebasv4.herokuapp.com/avaibleVehicles/{fecha1}/{fecha2}";
+        String API2 = $"https://pruebasv4.herokuapp.com/enableVehicles/";
 
         WebClient cliente = new WebClient();
 
-        var datos1 = cliente.DownloadString(API);
+        var datos2 = cliente.DownloadString(API2);
 
-        vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos1);
+        vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos2);
     }
 
     public async Task reservarVehiculo()
