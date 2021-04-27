@@ -1,5 +1,7 @@
 ﻿@page "/habilitar_cliente"
 
+@inject NavigationManager uriHelper
+
 <a href="/gestion_clientes"><img src="/imgs/arrow.png"></a>
 
 <br />
@@ -23,7 +25,7 @@
 <br />
 <br />
 
-<button class="btn btn-info" @onclick="habilitarCliente">Habilitar</button>
+<button class="btn btn-info" @onclick="habilitarCliente" type="button">Habilitar</button>
 
 
 @code {
@@ -40,12 +42,18 @@
 
         String API = $"https://pruebasv4.herokuapp.com/AllClient";
 
-        WebClient cliente = new WebClient();
+        var http = new HttpClient();
 
-        var datos = cliente.DownloadString(API);
-
-        lista_cliente = JsonConvert.DeserializeObject<List<Cliente>>(datos);
-
+        var datos1 = await http.GetAsync(API);
+       
+        try
+        {
+            lista_cliente = JsonConvert.DeserializeObject<List<Cliente>>(await datos1.Content.ReadAsStringAsync());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     public async Task habilitarCliente()
@@ -53,24 +61,17 @@
 
         var http = new HttpClient();
 
-        var cliente = new Cliente
+        var response = await http.PutAsync("https://pruebasv4.herokuapp.com/enableClient/" + cedula_cliente, null);
+
+        if (response.IsSuccessStatusCode)
         {
-
-        };
-
-        var jsonBody = JsonConvert.SerializeObject(cliente);
-        var buffer = Encoding.UTF8.GetBytes(jsonBody);
-        var byteContent = new ByteArrayContent(buffer);
-        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/enableClient/" + cedula_cliente, byteContent);
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var json = JsonConvert.DeserializeObject(content);
-
-        await JS.InvokeVoidAsync("alert", json);
-
+            await JS.InvokeVoidAsync("alert", "Cliente abilitado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
+        }
     }
 
     public class Cliente

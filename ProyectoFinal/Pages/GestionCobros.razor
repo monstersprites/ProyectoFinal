@@ -1,8 +1,10 @@
 ﻿@page "/gestion_cobros"
 
+@inject NavigationManager uriHelper
+
 <h3>Gestión de cobros</h3>
 
-<button class="btn btn-info" @onclick="listaCobros">Listar</button>
+<button class="btn btn-info" @onclick="listaCobros" type="button">Listar</button>
 
 <br />
 
@@ -40,27 +42,35 @@
 <input type="number" placeholder="Cantidad a pagar" @bind-value="pago" />
 <br />
 <br />
-<button class="btn btn-secondary" @onclick="pagar">Realizar pago</button>
+<button class="btn btn-secondary" @onclick="pagar" type="button">Realizar pago</button>
 
 @code {
-
+    [Inject]
+    public IJSRuntime JS { get; set; }
     string id_pago;
     int pago;
 
     List<Cobros> cobros = new List<Cobros>();
 
-    public void listaCobros()
+    public async Task listaCobros()
     {
 
         String API = $"https://pruebasv4.herokuapp.com/getAllPaymets";
 
-        WebClient cliente = new WebClient();
+        var http = new HttpClient();
 
-        var datos = cliente.DownloadString(API);
+        var datos = await http.GetAsync(API);
 
-        cobros = JsonConvert.DeserializeObject<List<Cobros>>(datos);
-
-    }
+        try
+        {
+            cobros = JsonConvert.DeserializeObject<List<Cobros>>(await datos.Content.ReadAsStringAsync());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            await JS.InvokeVoidAsync("alert", "No hay cobros");
+        }
+}
 
     public async Task pagar()
     {
@@ -77,7 +87,17 @@
         var byteContent = new ByteArrayContent(buffer);
         byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/updatePayment", byteContent);
+        var response = await http.PutAsync("https://pruebasv4.herokuapp.com/updatePayment", byteContent);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Registro editado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
+        }
     }
 
     public class Cobros
@@ -87,7 +107,7 @@
         public int RESERVATION { get; set; }
         public double BILL { get; set; }
         public int PAYED { get; set; }
-
+        public bool CONDITION { get; set;}
     }
 
     public class Pago

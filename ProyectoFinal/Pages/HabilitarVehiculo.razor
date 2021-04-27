@@ -1,5 +1,7 @@
 ﻿@page "/habilitar_vehiculo"
 
+@inject NavigationManager uriHelper
+
 <a href="/gestion_vehiculos"><img src="/imgs/arrow.png"></a>
 
 <br />
@@ -24,7 +26,7 @@
 <br />
 
 
-<button class="btn btn-info" @onclick="habilitarVehiculo">Habilitar</button>
+<button class="btn btn-info" @onclick="habilitarVehiculo" type="button">Habilitar</button>
 
 
 
@@ -39,15 +41,20 @@
 
     protected override async Task OnInitializedAsync()
     {
+        String API2 = $"https://pruebasv4.herokuapp.com/AllVehicle";
 
-        String API = $"https://pruebasv4.herokuapp.com/AllVehicle";
+        var http = new HttpClient();
 
-        WebClient cliente = new WebClient();
+        var datos2 = await http.GetAsync(API2);
 
-        var datos = cliente.DownloadString(API);
-
-        lista_vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos);
-
+        try
+        {
+            lista_vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(await datos2.Content.ReadAsStringAsync());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
     public async Task habilitarVehiculo()
@@ -55,24 +62,17 @@
 
         var http = new HttpClient();
 
-        var vehiculo = new Vehicle
+        var response = await http.PutAsync("https://pruebasv4.herokuapp.com/enableVehicle/" + matricula, null);
+
+        if (response.IsSuccessStatusCode)
         {
-
-        };
-
-        var jsonBody = JsonConvert.SerializeObject(vehiculo);
-        var buffer = Encoding.UTF8.GetBytes(jsonBody);
-        var byteContent = new ByteArrayContent(buffer);
-        byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-        var response = await http.PostAsync("https://pruebasv4.herokuapp.com/enableVehicle/" + matricula, byteContent);
-
-        var content = await response.Content.ReadAsStringAsync();
-
-        var json = JsonConvert.DeserializeObject(content);
-
-        await JS.InvokeVoidAsync("alert", json);
-
+            await JS.InvokeVoidAsync("alert", "Vehiculo abilitado exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
+        }
     }
 
     public class Vehicle

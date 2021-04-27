@@ -1,5 +1,7 @@
 ﻿@page "/gestion_reservas"
 
+@inject NavigationManager uriHelper
+
 <h3>Gestión de reservas</h3>
 
 @*<label for="txtvehiculo"></label>
@@ -27,7 +29,7 @@
 <br />
 <br />
 
-<button class="btn btn-secondary" @onclick="buscarVehiculos">Buscar vehiculos</button>
+<button class="btn btn-secondary" @onclick="buscarVehiculos" type="button">Buscar vehiculos</button>
 
 <br />
 <br />
@@ -56,10 +58,11 @@
 <br />
 <br />
 
-<button class="btn btn-info">Reservar</button>
+<button class="btn btn-info" @onclick=reservarVehiculo>Reservar</button>
 
 @code {
-
+    [Inject]
+    public IJSRuntime JS { get; set; }
     string matricula;
 
     string cedula_cliente;
@@ -76,30 +79,43 @@
     {
 
         String API = $"https://pruebasv4.herokuapp.com/AllClient";
-        //String API2 = $"https://pruebasv4.herokuapp.com/avaibleVehicles";
 
-        WebClient cliente = new WebClient();
+        var http = new HttpClient();
 
-        var datos1 = cliente.DownloadString(API);
+        var datos1 = await http.GetAsync(API);
        
-        clientes = JsonConvert.DeserializeObject<List<Cliente>>(datos1);
-
+        try
+        {
+            clientes = JsonConvert.DeserializeObject<List<Cliente>>(await datos1.Content.ReadAsStringAsync());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
     }
 
-    public void buscarVehiculos()
+    public async Task buscarVehiculos()
     {
 
-       // string fecha1 = fecha_inicio.ToString();
+        string fecha1 = fecha_inicio.ToShortDateString().Replace("/", "-");
 
-       // string fecha2 = fecha_final.ToString();
+        string fecha2 = fecha_final.ToShortDateString().Replace("/", "-");
 
-        String API2 = $"https://pruebasv4.herokuapp.com/enableVehicles/";
+        String API2 = $"https://pruebasv4.herokuapp.com/availableVehicles/{fecha_inicio}/{fecha_final}";
 
-        WebClient cliente = new WebClient();
+        var http = new HttpClient();
 
-        var datos2 = cliente.DownloadString(API2);
+        var datos2 = await http.GetAsync(API2);
 
-        vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(datos2);
+        try
+        {
+            vehiculos = JsonConvert.DeserializeObject<List<Vehicle>>(await datos2.Content.ReadAsStringAsync());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            await JS.InvokeVoidAsync("alert", "No hay vehiculos disponibles para esas fechas, cambie las fechas o intente mas tarde");
+        }
     }
 
     public async Task reservarVehiculo()
@@ -122,6 +138,15 @@
 
         var response = await http.PostAsync("https://pruebasv4.herokuapp.com/registrationReservation", byteContent);
 
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Reserva agregada exitosamente");
+            uriHelper.NavigateTo(uriHelper.Uri, forceLoad: true);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
+        }
     }
 
     public class Cliente
