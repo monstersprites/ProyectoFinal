@@ -2,13 +2,18 @@
 
 <a href="/gestion_reportes"><img src="/imgs/arrow.png"></a>
 
+<br />
+<br />
 
 <h3>Mapeado de vehiculos</h3>
 
 <hr />
 
+<br />
+
 <button class="btn btn-primary" @onclick="buscarVehiculos">Listar</button>
 
+<br />
 
 <RadzenGoogleMap id="map" style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 18.98367097987177, Lng = -70.45763034294242 }) MarkerClick=@OnMarkerClick>
     <Markers>
