@@ -129,24 +129,31 @@
 
         String API = $"https://pruebasv4.herokuapp.com/SearchEnrollment/{matricula}";
 
-        WebClient cliente = new WebClient();
+        var http = new HttpClient();
 
-        var datos = await cliente.DownloadStringTaskAsync(API);
+        var datos = await http.GetAsync(API);
 
-        var resultados = JsonConvert.DeserializeObject<Vehicle>(datos);
+        if (datos.IsSuccessStatusCode)
+        {
+            var resultados = JsonConvert.DeserializeObject<Vehicle>(await datos.Content.ReadAsStringAsync());
 
-        marca = resultados.BRAND;
-        modelo = resultados.MODEL;
-        año = resultados.YEAR;
-        color = resultados.COLOUR;
-        precio = resultados.PRICEPERDAY;
-        tipo = resultados.TYPE;
-        capacidad = (int.TryParse(resultados.LOADCAPACITY, out int number)) ? number : number;
-        pasajeros = resultados.PASSENGERS;
-        seguro = (long.TryParse(resultados.INSURANCE_NO, out long number2)) ? number2 : number2;
-        foto = resultados.PHOTO;
-        latitud = (double.TryParse(resultados.LATITUDE, out double number3)) ? number3 : number3;
-        longitud = (double.TryParse(resultados.LONGITUDE, out double number4)) ? number4 : number4;
+            marca = resultados.BRAND;
+            modelo = resultados.MODEL;
+            año = resultados.YEAR;
+            color = resultados.COLOUR;
+            precio = resultados.PRICEPERDAY;
+            tipo = resultados.TYPE;
+            capacidad = (int.TryParse(resultados.LOADCAPACITY, out int number)) ? number : number;
+            pasajeros = resultados.PASSENGERS;
+            seguro = (long.TryParse(resultados.INSURANCE_NO, out long number2)) ? number2 : number2;
+            foto = resultados.PHOTO;
+            latitud = (double.TryParse(resultados.LATITUDE, out double number3)) ? number3 : number3;
+            longitud = (double.TryParse(resultados.LONGITUDE, out double number4)) ? number4 : number4;
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Esa matricula no esta en el sistema, revise y vuelva a intentar");
+        }
     }
 
     public async Task editVehicle()
