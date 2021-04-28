@@ -83,7 +83,7 @@
         var http = new HttpClient();
 
         var datos1 = await http.GetAsync(API);
-       
+
         try
         {
             clientes = JsonConvert.DeserializeObject<List<Cliente>>(await datos1.Content.ReadAsStringAsync());
@@ -101,7 +101,7 @@
 
         string fecha2 = fecha_final.ToShortDateString().Replace("/", "-");
 
-        String API2 = $"https://pruebasv4.herokuapp.com/availableVehicles/{fecha_inicio}/{fecha_final}";
+        String API2 = $"https://pruebasv4.herokuapp.com/enableVehicles/";
 
         var http = new HttpClient();
 
@@ -127,8 +127,8 @@
         {
             vehicle = matricula,
             client = cedula_cliente,
-            startdate = fecha_inicio.ToString(),
-            endingdate = fecha_final.ToString()
+            startdate = fecha_inicio.ToShortDateString().Replace("/", "-"),
+            endingdate = fecha_final.ToShortDateString().Replace("/", "-")
         };
 
         var jsonBody = JsonConvert.SerializeObject(reserva);
@@ -147,6 +147,9 @@
         {
             await JS.InvokeVoidAsync("alert", "Revise los datos que ha agregado y vuelva a intentar");
         }
+
+        await JS.InvokeVoidAsync("console.log", await response.Content.ReadAsStringAsync());
+
     }
 
     public class Cliente

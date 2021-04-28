@@ -11,7 +11,7 @@
 
 <br />
 
-<button class="btn btn-primary" @onclick="buscarVehiculos">Listar</button>
+<button type="button" class="btn btn-primary" @onclick="buscarVehiculos">Listar</button>
 
 <br />
 
@@ -75,7 +75,10 @@
 
         foreach (var v in vehiculos)
         {
-            ubicaciones.Add(new Ubicaciones { Latitud = double.Parse(v.LATITUDE), Longitud = double.Parse(v.LONGITUDE) });
+                if (v.LATITUDE != "string" && v.LONGITUDE != "string")
+                {
+                    ubicaciones.Add(new Ubicaciones { Latitud = double.Parse(v.LATITUDE), Longitud = double.Parse(v.LONGITUDE) });
+                }
         }
 
     }
